@@ -7,10 +7,14 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlin.coroutines.CoroutineContext
 
-class UserRepositoryImpl(val dataSource: DataSource) : UserRepository {
+class UserRepositoryImpl(
+    val dataSource: DataSource,
+    private val ioDispatcher:CoroutineContext = Dispatchers.IO
+) : UserRepository {
 
-    val scope = CoroutineScope(Dispatchers.IO)
+    val scope = CoroutineScope(ioDispatcher)
 
     private lateinit var list: MutableList<String>
 
@@ -20,7 +24,7 @@ class UserRepositoryImpl(val dataSource: DataSource) : UserRepository {
         }
     }
 
-    override suspend fun fetchUsers(): List<String> = withContext(Dispatchers.IO) {
+    override suspend fun fetchUsers(): List<String> = withContext(ioDispatcher) {
         this@UserRepositoryImpl.list
     }
 
@@ -38,5 +42,11 @@ class UserRepositoryImpl(val dataSource: DataSource) : UserRepository {
     override suspend fun getScores(): Flow<Int> {
         return dataSource.counts()
     }
-    
+
+    suspend fun helloWorld(): String {
+        delay(1000)
+        return "hello world"
+    }
+
+
 }
